@@ -1,0 +1,29 @@
+<launch>
+    <arg name="color_camera_image" default="/img_in"/>
+    <!-- in square pixel units -->
+    <arg name="contour_threshold" default="1000"/>
+    <!-- in relation to original size -->
+    <arg name="contour_inflation" default="0.3"/>
+    <arg name="use_topic" default="false"/>
+    <arg name="video_filepath" default="$(find ml_interface)/testing_files/signs001.avi"/>
+    <arg name="net_model" default="$(find ml_interface)/testing_files/16-10-17_convnet_Zero_color_E50.h5"/>
+    <arg name="signs_dict" default="$(find ml_interface)/testing_files/names_dict.npy"/>
+
+    <arg name="debug" default="false"/>
+    <arg if="$(arg debug)" name="launch_prefix" value="xterm -e python -m pdb"/>
+    <arg unless="$(arg debug)" name="launch_prefix" value=""/>
+
+    <arg name="opencv_debug" default="false"/>
+
+    <node name="traffic_sign_preprocessing" pkg="ml_interface" type="traffic_sign_preprocessing_node.py" respawn="false" output="screen" launch-prefix="$(arg launch_prefix)">
+        <param name="use_topic" value="$(arg use_topic)"/>
+        <param if="$(arg use_topic)" name="color_camera_image" value="$(arg color_camera_image)"/>
+        <param name="contour_threshold" value="$(arg contour_threshold)"/>
+        <param name="contour_inflation" value="$(arg contour_inflation)"/>
+        <param unless="$(arg use_topic)" name="video_filepath" value="$(arg video_filepath)"/>
+        <param name="net_model" value="$(arg net_model)"/>
+        <param name="signs_dict" value="$(arg signs_dict)"/>
+        <param name="opencv_debug" value="$(arg opencv_debug)"/>
+        <remap from="img_in" to="$(arg color_camera_image)"/>
+    </node>
+</launch>
